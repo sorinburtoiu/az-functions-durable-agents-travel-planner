@@ -1,4 +1,4 @@
-# AI Travel Planner with Durable Agents
+# AI Travel Planner with Durable Agents (via Durable Functions)
 
 A travel planning application that demonstrates how to build **durable AI agents** using the [Durable Task extension for Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/user-guide/agents/agent-types/durable-agent/create-durable-agent). The application coordinates multiple specialized AI agents to create comprehensive, personalized travel plans through a structured workflow.
 
@@ -38,7 +38,8 @@ Traditional AI agents can be unpredictable and inconsistent. The [Durable Task e
 | **Orchestration** | Durable Task Scheduler |
 | **AI Model** | Azure OpenAI (GPT-4o-mini) |
 | **Frontend** | React |
-| **Hosting** | Azure Static Web Apps, Azure Functions |
+| **Frontend Hosting** | Azure Static Web Apps |
+| **Hosting** | Azure Functions(HttpTrigger, OrchestrationTrigger, ActivityTrigger) |
 | **Storage** | Azure Blob Storage |
 | **Infrastructure** | Bicep, Azure Developer CLI (azd) |
 
