@@ -19,6 +19,9 @@
     },
     "storageAccountName": {
       "value": "${AZURE_STORAGE_ACCOUNT}"
+    },
+    "resourceOwnerEmail": {
+      "value": "${AZURE_RESOURCE_OWNER_EMAIL}"
     }
   }
 }

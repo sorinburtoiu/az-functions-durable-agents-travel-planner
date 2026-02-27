@@ -82,11 +82,14 @@ param modelLocation string = location
 @description('The AI Service Account full ARM Resource ID. This is an optional field, and if not provided, the resource will be created.')
 param aiServiceAccountResourceId string = ''
 
+@description('Email address of the resource owner for tagging (required by policy)')
+param resourceOwnerEmail string = 'your-email.here@company.com'
+
 // Variables
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, rg.id, environmentName, location))
 var aiResourceToken = toLower(uniqueString(subscription().id, rg.id, environmentName, modelLocation))
-var tags = { 'azd-env-name': environmentName }
+var tags = union({ 'azd-env-name': environmentName }, !empty(resourceOwnerEmail) ? { 'resource_owner': resourceOwnerEmail } : {})
 var functionAppName = !empty(apiServiceName) ? apiServiceName : '${abbrs.webSitesFunctions}api-${resourceToken}'
 var deploymentStorageContainerName = 'app-package-${take(functionAppName, 32)}-${take(toLower(uniqueString(functionAppName, resourceToken)), 7)}'
 // Define the web app name first so we can construct the URL
