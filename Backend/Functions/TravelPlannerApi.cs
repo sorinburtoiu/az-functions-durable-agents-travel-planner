@@ -27,15 +27,13 @@ public class TravelPlannerApi
     "✓ Completed - The travel planning process has completed successfully.<BR>" +
     "The status remains the same if the process fails.")]
     [OpenApiRequestBody(contentType: MediaTypeNames.Application.Json, bodyType: typeof(TravelRequest), Example = typeof(TravelRequestExample), Description = "Details of the travel request")]
-    
-[OpenApiResponseWithBody(
-    statusCode: HttpStatusCode.Accepted,
-    contentType: MediaTypeNames.Application.Json,
-    bodyType: typeof(TravelPlanningStatusResponse),
-    Example = typeof(TravelPlanningStatusResponseExample),
-    Description = "The status of the travel planning process"
-)]
-
+    [OpenApiResponseWithBody(
+        statusCode: HttpStatusCode.Accepted,
+        contentType: MediaTypeNames.Application.Json,
+        bodyType: typeof(TravelPlanningStatusResponse),
+        Example = typeof(TravelPlanningStatusResponseExample),
+        Description = "The status of the travel planning process"
+    )]
     public async Task<HttpResponseData> StartTravelPlanning(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "travel-planner")] HttpRequestData req,
         [DurableClient] DurableTaskClient client)
@@ -130,137 +128,175 @@ public async Task<HttpResponseData> GetTravelPlanningStatus(
     return response;
 }
 
-    [Function(nameof(HandleApprovalResponse))]
-    public async Task<HttpResponseData> HandleApprovalResponse(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "travel-planner/approve/{instanceId}")] HttpRequestData req,
-        string instanceId,
-        [DurableClient] DurableTaskClient client)
-    {
-        _logger.LogInformation("Received approval response for orchestration with ID = {instanceId}", instanceId);
+[Function(nameof(HandleApprovalResponse))]
+[OpenApiOperation(
+    tags: ["Travel Planner"],
+    Summary = "Handles approval or rejection from the user.",
+    Description = "Receives an approval or rejection response and forwards it to the travel planning orchestration.")]
+[OpenApiParameter(
+    name: "instanceId",
+    In = ParameterLocation.Path,
+    Required = true,
+    Type = typeof(string),
+    Description = "The orchestration instance ID to send the approval response to.")]
+[OpenApiRequestBody(
+    contentType: MediaTypeNames.Application.Json,
+    bodyType: typeof(ApprovalResponse),
+    Example = typeof(ApprovalResponseExample),
+    Required = true,
+    Description = "Approval response payload.")]
+[OpenApiResponseWithBody(
+    statusCode: HttpStatusCode.OK,
+    contentType: MediaTypeNames.Application.Json,
+    bodyType: typeof(ApprovalProcessingResult),
+    Example = typeof(ApprovalProcessingResultExample),
+    Description = "Indicates that the approval response was successfully processed.")]
+[OpenApiResponseWithoutBody(
+    statusCode: HttpStatusCode.BadRequest,
+    Description = "Invalid approval response format.")]
+public async Task<HttpResponseData> HandleApprovalResponse(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "travel-planner/approve/{instanceId}")] HttpRequestData req,
+    string instanceId,
+    [DurableClient] DurableTaskClient client)
+{
+    _logger.LogInformation("Received approval response for orchestration with ID = {instanceId}", instanceId);
 
-        // Parse the approval response
-        ApprovalResponse approvalResponse;
+    // Parse the approval response
+    ApprovalResponse approvalResponse;
+    try
+    {
+        approvalResponse = await req.ReadFromJsonAsync<ApprovalResponse>()
+            ?? throw new InvalidOperationException("Invalid approval response");
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Failed to parse approval response");
+        var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+        await badResponse.WriteStringAsync("Invalid approval response format");
+        return badResponse;
+    }
+
+    // Send to orchestration
+    _logger.LogInformation("Sending approval response to orchestration: Approved = {approved}", approvalResponse.Approved);
+    await client.RaiseEventAsync(instanceId, "ApprovalEvent", approvalResponse);
+
+    // Build clean response model
+    var result = new ApprovalProcessingResult(
+        InstanceId: instanceId,
+        Message: "Approval response processed successfully",
+        Approved: approvalResponse.Approved
+    );
+
+    var response = req.CreateResponse(HttpStatusCode.OK);
+    await response.WriteAsJsonAsync(result);
+    return response;
+}
+
+
+
+   [Function(nameof(GetTripConfirmationStatus))]
+[OpenApiOperation(
+    tags: ["Travel Planner"],
+    Summary = "Gets the booking confirmation status.",
+    Description = "Returns whether the trip was confirmed, rejected, or is still pending based on the orchestration output."
+)]
+[OpenApiParameter(
+    name: "instanceId",
+    In = ParameterLocation.Path,
+    Required = true,
+    Type = typeof(string),
+    Description = "The orchestration instance ID."
+)]
+[OpenApiResponseWithBody(
+    statusCode: HttpStatusCode.OK,
+    contentType: MediaTypeNames.Application.Json,
+    bodyType: typeof(TripConfirmationStatusResponse),
+    Example = typeof(TripConfirmationStatusResponseExample),
+    Description = "The confirmation status for the trip."
+)]
+[OpenApiResponseWithoutBody(
+    statusCode: HttpStatusCode.NotFound,
+    Description = "No orchestration instance was found with the provided ID."
+)]
+public async Task<HttpResponseData> GetTripConfirmationStatus(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "travel-planner/confirmation/{instanceId}")] HttpRequestData req,
+    string instanceId,
+    [DurableClient] DurableTaskClient client)
+{
+    _logger.LogInformation("Getting confirmation status for orchestration with ID = {instanceId}", instanceId);
+
+    var status = await client.GetInstanceAsync(instanceId, true);
+
+    if (status == null)
+    {
+        var notFound = req.CreateResponse(HttpStatusCode.NotFound);
+        await notFound.WriteStringAsync($"No orchestration found with ID = {instanceId}");
+        return notFound;
+    }
+
+    bool isConfirmed = false;
+    bool isRejected = false;
+    string confirmationMessage = "";
+
+    if (status.RuntimeStatus == OrchestrationRuntimeStatus.Completed &&
+        status.ReadOutputAs<object>() != null)
+    {
         try
         {
-            approvalResponse = await req.ReadFromJsonAsync<ApprovalResponse>() 
-                ?? throw new InvalidOperationException("Invalid approval response");
+            var jsonOutput = status.ReadOutputAs<System.Text.Json.JsonElement>();
+
+            if (jsonOutput.TryGetProperty("bookingConfirmation", out var bookingProperty) ||
+                jsonOutput.TryGetProperty("BookingConfirmation", out bookingProperty))
+            {
+                string? raw = bookingProperty.GetString();
+
+                if (!string.IsNullOrEmpty(raw))
+                {
+                    if (raw.Contains("Booking confirmed"))
+                    {
+                        isConfirmed = true;
+                        confirmationMessage = raw;
+                    }
+                    else if (raw.Contains("not approved"))
+                    {
+                        isRejected = true;
+                        confirmationMessage = raw;
+                    }
+                }
+            }
+            else
+            {
+                string fallback = jsonOutput.ToString();
+                if (fallback.Contains("Booking confirmed"))
+                {
+                    isConfirmed = true;
+                    confirmationMessage = fallback;
+                }
+                else if (fallback.Contains("not approved"))
+                {
+                    isRejected = true;
+                    confirmationMessage = fallback;
+                }
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to parse approval response");
-            var errorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-            await errorResponse.WriteStringAsync("Invalid approval response format");
-            return errorResponse;
+            _logger.LogError(ex, "Error parsing orchestration output");
         }
-
-        // Send the approval response to the orchestration
-        _logger.LogInformation("Sending approval response to orchestration: Approved = {approved}", approvalResponse.Approved);
-        await client.RaiseEventAsync(instanceId, "ApprovalEvent", approvalResponse);
-
-        // Return a success response
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        await response.WriteAsJsonAsync(new
-        {
-            instanceId,
-            message = "Approval response processed successfully",
-            approved = approvalResponse.Approved
-        });
-
-        return response;
     }
 
+    var payload = new TripConfirmationStatusResponse(
+        InstanceId: instanceId,
+        IsConfirmed: isConfirmed,
+        IsRejected: isRejected,
+        ConfirmationMessage: confirmationMessage,
+        RuntimeStatus: status.RuntimeStatus.ToString()
+    );
 
+    var response = req.CreateResponse(HttpStatusCode.OK);
+    await response.WriteAsJsonAsync(payload);
 
-    [Function(nameof(GetTripConfirmationStatus))]
-    public async Task<HttpResponseData> GetTripConfirmationStatus(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "travel-planner/confirmation/{instanceId}")] HttpRequestData req,
-        string instanceId,
-        [DurableClient] DurableTaskClient client)
-    {
-        _logger.LogInformation("Getting confirmation status for orchestration with ID = {instanceId}", instanceId);
+    return response;
+}
 
-        // Get the orchestration status
-        var status = await client.GetInstanceAsync(instanceId, true);
-        _logger.LogInformation("Confirmation status for instance = {instanceId}", status); 
-
-        if (status == null)
-        {
-            var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-            await notFoundResponse.WriteStringAsync($"No orchestration found with ID = {instanceId}");
-            return notFoundResponse;
-        }
-
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        
-        // Check if the booking has been confirmed
-        bool isConfirmed = false;
-        bool isRejected = false;
-        string confirmationMessage = "";
-        
-        // Check if the orchestration is completed and has output with booking confirmation
-        if (status.RuntimeStatus == OrchestrationRuntimeStatus.Completed && status.ReadOutputAs<object>() != null)
-        {
-            try
-            {
-                // First try to read as JSON element
-                var jsonOutput = status.ReadOutputAs<System.Text.Json.JsonElement>();
-                
-                // Check for booking confirmation properties
-                if (jsonOutput.TryGetProperty("bookingConfirmation", out var bookingConfirmationElement) || 
-                    jsonOutput.TryGetProperty("BookingConfirmation", out bookingConfirmationElement))
-                {
-                    if (bookingConfirmationElement.ValueKind == System.Text.Json.JsonValueKind.String)
-                    {
-                        string? bookingConfirmation = bookingConfirmationElement.GetString();
-                        if (bookingConfirmation != null)
-                        {
-                            if (bookingConfirmation.Contains("Booking confirmed"))
-                            {
-                                isConfirmed = true;
-                                confirmationMessage = bookingConfirmation;
-                            }
-                            else if (bookingConfirmation.Contains("not approved"))
-                            {
-                                isRejected = true;
-                                confirmationMessage = bookingConfirmation;
-                            }
-                        }
-                    }
-                }
-                // If we couldn't find the booking confirmation property, check other properties or the whole object
-                else
-                {
-                    string outputString = jsonOutput.ToString();
-                    if (!string.IsNullOrEmpty(outputString))
-                    {
-                        if (outputString.Contains("Booking confirmed"))
-                        {
-                            isConfirmed = true;
-                            confirmationMessage = outputString;
-                        }
-                        else if (outputString.Contains("not approved"))
-                        {
-                            isRejected = true;
-                            confirmationMessage = outputString;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing orchestration output");
-            }
-        }
-        
-        await response.WriteAsJsonAsync(new
-        {
-            instanceId,
-            isConfirmed,
-            isRejected,
-            confirmationMessage,
-            status.RuntimeStatus
-        });
-
-        return response;
-    }
 }
