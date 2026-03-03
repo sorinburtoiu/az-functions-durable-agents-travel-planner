@@ -1,16 +1,22 @@
 using Azure.AI.OpenAI;
 using Azure.Identity;
-using Microsoft.Agents.AI.Hosting.AzureFunctions;
-using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Agents.AI.DurableTask;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.AI;
-using OpenAI;
-using TravelPlannerFunctions.Tools;
+using Microsoft.Agents.AI.Hosting.AzureFunctions;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Azure.Functions.Worker.Extensions.OpenApi;
+using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Functions;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenAI;
+using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
+using TravelPlannerFunctions.Functions;
+using TravelPlannerFunctions.Tools;
 
 string endpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
     ?? throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT is not set.");
@@ -237,6 +243,14 @@ builder.Services.AddCors(options =>
     });
 });
 
+//// set OpenAPIOptions for Swagger support
+//var version = configuration.GetValue<string>("Version") ?? "1.0";
+builder.Services.AddSingleton<IOpenApiConfigurationOptions>(config => new HttpOpenApiConfigurationOptions("1.0.0"));
+
+//builder.ConfigureOpenApi();
+builder.Services.AddSingleton<IOpenApiHttpTriggerContext, OpenApiHttpTriggerContext>();
+builder.Services.AddSingleton<IOpenApiTriggerFunction, OpenApiTriggerFunction>();
+
 // Build and run the application.
 var app = builder.Build();
 
@@ -245,3 +259,6 @@ var httpClientFactory = app.Services.GetRequiredService<IHttpClientFactory>();
 CurrencyConverterTool.Initialize(httpClientFactory);
 
 app.Run();
+
+[ExcludeFromCodeCoverage]
+public partial class Program { }

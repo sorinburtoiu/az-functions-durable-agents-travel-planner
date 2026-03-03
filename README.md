@@ -177,7 +177,7 @@ The dashboard shows:
 **Bash**
 ```bash
 npm install -g azurite
-azurite --silent --location ./azurite &
+azurite --silent --location ./azurite
 ```
 
 **PowerShell**
