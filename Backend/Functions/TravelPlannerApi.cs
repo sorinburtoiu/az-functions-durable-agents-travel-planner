@@ -5,6 +5,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using TravelPlannerFunctions.Models;
 
 namespace TravelPlannerFunctions.Functions;
@@ -26,7 +27,15 @@ public class TravelPlannerApi
     "✓ Completed - The travel planning process has completed successfully.<BR>" +
     "The status remains the same if the process fails.")]
     [OpenApiRequestBody(contentType: MediaTypeNames.Application.Json, bodyType: typeof(TravelRequest), Example = typeof(TravelRequestExample), Description = "Details of the travel request")]
-    //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: MediaTypeNames.Application.Json, bodyType: typeof(TravelPlanningStatusResponse), Example = typeof(TravelPlanningStatusResponseExample), Description = "The status of the travel planning process")]
+    
+[OpenApiResponseWithBody(
+    statusCode: HttpStatusCode.Accepted,
+    contentType: MediaTypeNames.Application.Json,
+    bodyType: typeof(TravelPlanningStatusResponse),
+    Example = typeof(TravelPlanningStatusResponseExample),
+    Description = "The status of the travel planning process"
+)]
+
     public async Task<HttpResponseData> StartTravelPlanning(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "travel-planner")] HttpRequestData req,
         [DurableClient] DurableTaskClient client)
@@ -60,38 +69,66 @@ public class TravelPlannerApi
         // Add a Location header that points to the status endpoint
         response.Headers.Add("Location", $"/api/travel-planner/status/{instanceId}");
         
-        await response.WriteAsJsonAsync(new
-        {
-            id = instanceId,
-            statusQueryUrl = $"/api/travel-planner/status/{instanceId}"
-        });
+
+        var payload = new TravelPlanningStatusResponse(
+            Id: instanceId,
+            StatusQueryUrl: $"/api/travel-planner/status/{instanceId}"
+        );
+
+        await response.WriteAsJsonAsync(payload);
 
         return response;
     }
 
-    [Function(nameof(GetTravelPlanningStatus))]
-    public async Task<HttpResponseData> GetTravelPlanningStatus(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "travel-planner/status/{instanceId}")] HttpRequestData req,
-        string instanceId,
-        [DurableClient] DurableTaskClient client)
+[Function(nameof(GetTravelPlanningStatus))]
+[OpenApiOperation(
+    tags: ["Travel Planner"],
+    Summary = "Gets the status of a travel planning orchestration.",
+    Description = "Returns the current runtime status and details of a travel planning orchestration instance.")]
+[OpenApiParameter(
+    name: "instanceId",
+    In = ParameterLocation.Path,
+    Required = true,
+    Type = typeof(string),
+    Description = "The orchestration instance ID.")]
+[OpenApiResponseWithBody(
+    statusCode: HttpStatusCode.OK,
+    contentType: MediaTypeNames.Application.Json,
+    bodyType: typeof(TravelPlanningStatusDetails),
+    Example = typeof(TravelPlanningStatusDetailsExample),
+    Description = "Details of the orchestration status.")]
+[OpenApiResponseWithoutBody(
+    statusCode: HttpStatusCode.NotFound,
+    Description = "No orchestration with the specified ID exists.")]
+public async Task<HttpResponseData> GetTravelPlanningStatus(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "travel-planner/status/{instanceId}")] HttpRequestData req,
+    string instanceId,
+    [DurableClient] DurableTaskClient client)
+{
+    _logger.LogInformation("Getting status for orchestration with ID = {instanceId}", instanceId);
+
+    var status = await client.GetInstanceAsync(instanceId, true);
+
+    if (status == null)
     {
-        _logger.LogInformation("Getting status for orchestration with ID = {instanceId}", instanceId);
-
-        // Get the orchestration status
-        var status = await client.GetInstanceAsync(instanceId, true);
-        _logger.LogInformation("Status for instance = {instanceId}", status); 
-
-        if (status == null)
-        {
-            var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-            await notFoundResponse.WriteStringAsync($"No orchestration found with ID = {instanceId}");
-            return notFoundResponse;
-        }
-
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        await response.WriteAsJsonAsync(status);
-        return response;
+        var notFound = req.CreateResponse(HttpStatusCode.NotFound);
+        await notFound.WriteStringAsync($"No orchestration found with ID = {instanceId}");
+        return notFound;
     }
+
+    var responseModel = new TravelPlanningStatusDetails(
+        InstanceId: status.InstanceId,
+        RuntimeStatus: status.RuntimeStatus.ToString(),
+        Input: status.ReadInputAs<string>(),
+        Output: status.ReadOutputAs<string>(),
+        CreatedTime: status.CreatedAt ,
+        LastUpdatedTime: status.LastUpdatedAt
+    );
+
+    var response = req.CreateResponse(HttpStatusCode.OK);
+    await response.WriteAsJsonAsync(responseModel);
+    return response;
+}
 
     [Function(nameof(HandleApprovalResponse))]
     public async Task<HttpResponseData> HandleApprovalResponse(
