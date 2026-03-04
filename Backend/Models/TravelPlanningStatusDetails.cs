@@ -4,15 +4,15 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using Newtonsoft.Json.Serialization;
 using TravelPlannerFunctions.Models;
 
-namespace TravelPlannerFunctions.Functions;
+namespace TravelPlannerFunctions.Models;
 
 public record TravelPlanningStatusDetails(
     string InstanceId,
     string RuntimeStatus,
     object Input,
     object Output,
-    DateTimeOffset CreatedTime,
-    DateTimeOffset LastUpdatedTime
+    DateTime CreatedTime,
+    DateTime LastUpdatedTime
 );
 
 public static class TravelPlanningStatusDetailsExamples

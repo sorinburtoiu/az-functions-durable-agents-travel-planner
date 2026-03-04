@@ -68,12 +68,18 @@ public class TravelPlannerApi
         response.Headers.Add("Location", $"/api/travel-planner/status/{instanceId}");
         
 
-        var payload = new TravelPlanningStatusResponse(
-            Id: instanceId,
-            StatusQueryUrl: $"/api/travel-planner/status/{instanceId}"
-        );
+        // var payload = new TravelPlanningStatusResponse(
+        //     Id: instanceId,
+        //     StatusQueryUrl: $"/api/travel-planner/status/{instanceId}"
+        // );
 
-        await response.WriteAsJsonAsync(payload);
+        // await response.WriteAsJsonAsync(payload);
+
+        await response.WriteAsJsonAsync(new
+        {
+            id = instanceId,
+            statusQueryUrl = $"/api/travel-planner/status/{instanceId}"
+        });
 
         return response;
     }
@@ -114,17 +120,17 @@ public async Task<HttpResponseData> GetTravelPlanningStatus(
         return notFound;
     }
 
-    var responseModel = new TravelPlanningStatusDetails(
-        InstanceId: status.InstanceId,
-        RuntimeStatus: status.RuntimeStatus.ToString(),
-        Input: status.ReadInputAs<string>(),
-        Output: status.ReadOutputAs<string>(),
-        CreatedTime: status.CreatedAt ,
-        LastUpdatedTime: status.LastUpdatedAt
-    );
+    // var responseModel = new TravelPlanningStatusDetails(
+    //     InstanceId: status.InstanceId,
+    //     RuntimeStatus: status.RuntimeStatus.ToString(),
+    //     Input: status.ReadInputAs<string>(),
+    //     Output: status.ReadOutputAs<string>(),
+    //     CreatedTime: status.CreatedAt.LocalDateTime,
+    //     LastUpdatedTime: status.LastUpdatedAt.LocalDateTime
+    // );
 
     var response = req.CreateResponse(HttpStatusCode.OK);
-    await response.WriteAsJsonAsync(responseModel);
+    await response.WriteAsJsonAsync(status);
     return response;
 }
 
@@ -180,15 +186,25 @@ public async Task<HttpResponseData> HandleApprovalResponse(
     _logger.LogInformation("Sending approval response to orchestration: Approved = {approved}", approvalResponse.Approved);
     await client.RaiseEventAsync(instanceId, "ApprovalEvent", approvalResponse);
 
-    // Build clean response model
-    var result = new ApprovalProcessingResult(
-        InstanceId: instanceId,
-        Message: "Approval response processed successfully",
-        Approved: approvalResponse.Approved
-    );
+    // // Build clean response model
+    // var result = new ApprovalProcessingResult(
+    //     InstanceId: instanceId,
+    //     Message: "Approval response processed successfully",
+    //     Approved: approvalResponse.Approved
+    // );
 
+    // var response = req.CreateResponse(HttpStatusCode.OK);
+    // await response.WriteAsJsonAsync(result);
+
+    // Return a success response
     var response = req.CreateResponse(HttpStatusCode.OK);
-    await response.WriteAsJsonAsync(result);
+    await response.WriteAsJsonAsync(new
+    {
+        instanceId,
+        message = "Approval response processed successfully",
+        approved = approvalResponse.Approved
+    });
+
     return response;
 }
 
@@ -285,16 +301,26 @@ public async Task<HttpResponseData> GetTripConfirmationStatus(
         }
     }
 
-    var payload = new TripConfirmationStatusResponse(
-        InstanceId: instanceId,
-        IsConfirmed: isConfirmed,
-        IsRejected: isRejected,
-        ConfirmationMessage: confirmationMessage,
-        RuntimeStatus: status.RuntimeStatus.ToString()
-    );
-
     var response = req.CreateResponse(HttpStatusCode.OK);
-    await response.WriteAsJsonAsync(payload);
+
+    // var payload = new TripConfirmationStatusResponse(
+    //     InstanceId: instanceId,
+    //     IsConfirmed: isConfirmed,
+    //     IsRejected: isRejected,
+    //     ConfirmationMessage: confirmationMessage,
+    //     RuntimeStatus: status.RuntimeStatus
+    // );
+
+    // await response.WriteAsJsonAsync(payload);
+
+    await response.WriteAsJsonAsync(new
+    {
+        instanceId,
+        isConfirmed,
+        isRejected,
+        confirmationMessage,
+        status.RuntimeStatus
+    });
 
     return response;
 }

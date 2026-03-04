@@ -174,6 +174,9 @@ The dashboard shows:
 
 ### 1. Start Azure Storage Emulator
 
+Start **azurite** in the same root where **Azure Functions** will be started.
+
+
 **Bash**
 ```bash
 npm install -g azurite
@@ -229,6 +232,8 @@ az cognitiveservices account list --query "[?kind=='OpenAI']" -o table
 
 ### 4. Start the Backend
 
+Start functions in the same root where **azurite** has started.
+
 ```bash
 func start
 ```
@@ -249,6 +254,20 @@ To remove all Azure resources and avoid ongoing charges:
 
 ```bash
 azd down --purge
+```
+
+## Working with env in Visual Studio Code
+
+First time **azd up** run create an envronment.
+
+To create a new one:
+
+```bash
+ azd env new prd-test-sorin
+```
+To switch back:
+```bash
+azd env select prd-environment
 ```
 
 ## Learn More

@@ -15,8 +15,14 @@ using Microsoft.Extensions.Logging;
 using OpenAI;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using TravelPlannerFunctions.Functions;
 using TravelPlannerFunctions.Tools;
+using System.Text.Json;
+using Microsoft.Azure.Functions.Worker.Extensions.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 
 string endpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
     ?? throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT is not set.");
@@ -168,6 +174,16 @@ FunctionsApplicationBuilder builder = FunctionsApplication
                     services: sp
                 ));
     });
+
+
+// Apply camelCase to ALL HTTP JSON serialization/deserialization
+builder.Services.AddControllers()
+                .AddJsonOptions(o =>
+                {
+                    o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                });
+
 
 // Configure additional services
 builder.Services.AddApplicationInsightsTelemetryWorkerService().ConfigureFunctionsApplicationInsights();

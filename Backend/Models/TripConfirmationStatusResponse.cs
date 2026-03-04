@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+using Microsoft.DurableTask.Client;
 using Newtonsoft.Json.Serialization;
 
 namespace TravelPlannerFunctions.Models;
@@ -10,7 +11,7 @@ public record TripConfirmationStatusResponse(
     bool IsConfirmed,
     bool IsRejected,
     string ConfirmationMessage,
-    string RuntimeStatus
+    OrchestrationRuntimeStatus RuntimeStatus
 );
 
 public static class TripConfirmationStatusResponseExamples
@@ -20,7 +21,7 @@ public static class TripConfirmationStatusResponseExamples
         IsConfirmed: true,
         IsRejected: false,
         ConfirmationMessage: "Booking confirmed for travel itinerary",
-        RuntimeStatus: "Completed"
+        RuntimeStatus: OrchestrationRuntimeStatus.Completed
     );
 
     public static readonly TripConfirmationStatusResponse RejectedExample = new(
@@ -28,7 +29,7 @@ public static class TripConfirmationStatusResponseExamples
         IsConfirmed: false,
         IsRejected: true,
         ConfirmationMessage: "Booking not approved due to invalid payment details",
-        RuntimeStatus: "Completed"
+        RuntimeStatus: OrchestrationRuntimeStatus.Completed
     );
 
     public static readonly TripConfirmationStatusResponse PendingExample = new(
@@ -36,7 +37,7 @@ public static class TripConfirmationStatusResponseExamples
         IsConfirmed: false,
         IsRejected: false,
         ConfirmationMessage: "",
-        RuntimeStatus: "Running"
+        RuntimeStatus: OrchestrationRuntimeStatus.Running
     );
 }
 

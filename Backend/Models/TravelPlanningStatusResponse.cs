@@ -4,7 +4,7 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using Newtonsoft.Json.Serialization;
 using TravelPlannerFunctions.Models;
 
-namespace TravelPlannerFunctions.Functions;
+namespace TravelPlannerFunctions.Models;
 
 public record TravelPlanningStatusResponse(
     string Id,
