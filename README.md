@@ -272,6 +272,8 @@ azd env select prd-environment
 
 ## Learn More
 
+See here [How Microsoft Agent Framework (MAF) Is Used](./MAF_Usage.md)
+
 To learn more, please check out these resources:
 
 - [Durable Task Extension for Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/user-guide/agents/agent-types/durable-agent/create-durable-agent)
