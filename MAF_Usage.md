@@ -170,7 +170,7 @@ Agents focus purely on AI reasoning.
 
 ------------------------------------------------------------------------
 
-# Architectural Separation
+# 6. Architectural Separation
 
 | Responsibility | Technology |
 |---------------|------------|
@@ -182,7 +182,7 @@ Agents focus purely on AI reasoning.
 
 ------------------------------------------------------------------------
 
-# Summary
+# 7. Summary
 
 In this repository, Microsoft Agent Framework is used to:
 
@@ -197,7 +197,7 @@ provides the AI intelligence layer.
 
 ------------------------------------------------------------------------
 
-# High-Level Flow
+# 8. High-Level Flow
 
 User Request\
     ↓\
