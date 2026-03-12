@@ -23,23 +23,23 @@
   padding: 0 20px;
 }
 
-/* New Plan Button - styled with light green */
+/* New Plan Button - styled with light orange */
 .new-plan-btn {
   padding: 8px 16px;
-  background-color: #8BBF9F;
+  background-color: #F4A261;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(139, 191, 159, 0.4);
+  box-shadow: 0 2px 8px rgba(244, 162, 97, 0.4);
 }
 
 .new-plan-btn:hover {
-  background-color: #74A987;
+  background-color: #E67E22;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 191, 159, 0.5);
+  box-shadow: 0 4px 12px rgba(244, 162, 97, 0.5);
 }
 
 /* Travel Form Container - glass morphism effect with stronger padding rule */
@@ -88,7 +88,7 @@
 .form-group textarea {
   width: 100%;
   padding: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  border: 1px solid #F6543E;
   border-radius: 8px;
   font-size: 1rem;
   background: rgba(255, 255, 255, 0.9);
@@ -104,12 +104,12 @@
   background: rgba(255, 255, 255, 1);
 }
 
-/* Submit Button - light green gradient style */
+/* Submit Button - light orange gradient style */
 .submit-btn {
   display: block;
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #8BBF9F, #74A987);
+  background: linear-gradient(135deg, #F4A261, #E67E22);
   color: white;
   border: none;
   border-radius: 8px;
@@ -118,21 +118,21 @@
   cursor: pointer;
   margin-top: 25px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(139, 191, 159, 0.4);
+  box-shadow: 0 4px 12px rgba(244, 162, 97, 0.4);
 }
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(139, 191, 159, 0.5);
+  box-shadow: 0 6px 18px rgba(244, 162, 97, 0.5);
 }
 
 .submit-btn:active:not(:disabled) {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(139, 191, 159, 0.4);
+  box-shadow: 0 2px 8px rgba(244, 162, 97, 0.4);
 }
 
 .submit-btn:disabled {
-  background: linear-gradient(135deg, #B0D8BC, #9ECBAD);
+  background: linear-gradient(135deg, #F7C58D, #F3B56B);
   cursor: not-allowed;
   transform: none;
 }
@@ -182,12 +182,12 @@
 }
 
 .chat-message.bot {
-  background: rgba(76, 154, 86, 0.2); /* Darker green background for better contrast */
+  background: rgba(230, 126, 34, 0.2); /* Darker orange background for better contrast */
   margin-left: auto;  /* Left margin for alignment */
   margin-right: auto; /* Auto margin will help center or align left */
-  border-right: 4px solid #41843D; /* Darker green border for higher contrast */
+  border-right: 4px solid #C96A1A; /* Darker orange border for higher contrast */
   border-radius: 12px; /* Consistent border radius */
-  box-shadow: 0 3px 10px rgba(65, 132, 61, 0.15);
+  box-shadow: 0 3px 10px rgba(201, 106, 26, 0.15);
   position: relative; /* Add position for potential pattern */
 }
 
@@ -202,7 +202,7 @@
 .chat-message h3 {
   margin-top: 16px;
   margin-bottom: 12px;
-  color: #1e40af;
+  color: #F6543E;
   font-weight: 600;
 }
 
@@ -269,7 +269,7 @@
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #8BBF9F, #74A987);
+  background: linear-gradient(135deg, #F4A261, #E67E22);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
@@ -277,9 +277,9 @@
 }
 
 .chat-input button:hover {
-  background: linear-gradient(135deg, #74A987, #5D9270);
+  background: linear-gradient(135deg, #E67E22, #C96A1A);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 191, 159, 0.4);
+  box-shadow: 0 4px 12px rgba(244, 162, 97, 0.4);
 }
 
 .loading-spinner {
@@ -300,9 +300,9 @@
   padding: 20px;
   margin: 20px auto; /* Changed from 20px 0 to 20px auto for horizontal centering */
   border-radius: 12px;
-  background-color: rgba(139, 191, 159, 0.1);
-  border: 1px solid rgba(139, 191, 159, 0.3);
-  box-shadow: 0 4px 15px rgba(139, 191, 159, 0.15);
+  background-color: rgba(244, 162, 97, 0.1);
+  border: 1px solid rgba(244, 162, 97, 0.3);
+  box-shadow: 0 4px 15px rgba(244, 162, 97, 0.15);
   min-height: 200px; /* Add minimum height to ensure vertical centering */
   width: 90%; /* Match the max-width of chat messages */
 }
@@ -311,8 +311,8 @@
   width: 60px;
   height: 60px;
   border-width: 6px;
-  border: 6px solid rgba(139, 191, 159, 0.2);
-  border-left-color: #74A987;
+  border: 6px solid rgba(244, 162, 97, 0.2);
+  border-left-color: #E67E22;
 }
 
 .loading-message {
@@ -335,7 +335,7 @@
 }
 
 h1 {
-  color: #495858;
+  color: #e61616;
   margin: 0;
   font-weight: 600;
 }
@@ -343,9 +343,9 @@ h1 {
 /* Approval Section */
 .approve-section {
   padding: 25px;
-  background-color: rgba(240, 249, 243, 0.95);
+  background-color: rgba(255, 247, 237, 0.95);
   text-align: center;
-  border-top: 2px solid rgba(139, 191, 159, 0.4);
+  border-top: 2px solid rgba(244, 162, 97, 0.4);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
 }
 
@@ -369,7 +369,7 @@ h1 {
 
 .approve-btn {
   padding: 12px 30px;
-  background: linear-gradient(135deg, #8BBF9F, #74A987);
+  background: linear-gradient(135deg, #F4A261, #E67E22);
   color: white;
   border: none;
   border-radius: 8px;
@@ -377,18 +377,18 @@ h1 {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(139, 191, 159, 0.4);
+  box-shadow: 0 4px 12px rgba(244, 162, 97, 0.4);
 }
 
 .approve-btn:hover {
-  background: linear-gradient(135deg, #74A987, #5D9270);
+  background: linear-gradient(135deg, #E67E22, #C96A1A);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 191, 159, 0.5);
+  box-shadow: 0 6px 16px rgba(244, 162, 97, 0.5);
 }
 
 .approve-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(139, 191, 159, 0.4);
+  box-shadow: 0 2px 8px rgba(244, 162, 97, 0.4);
 }
 
 .reject-btn {
