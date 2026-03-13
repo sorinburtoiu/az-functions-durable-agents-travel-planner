@@ -127,6 +127,10 @@ This command will:
 
 Follow the prompts to select your subscription and region.
 
+#### Link Static Web App to API
+
+After deployment in Azure we need to link SPA with Api: [Link SPA with API](link_spa_api.md)
+
 ### 6. Access the Application
 
 Once deployment completes, the CLI will output the URLs for your services:
