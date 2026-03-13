@@ -47,12 +47,12 @@ Traditional AI agents can be unpredictable and inconsistent. The [Durable Task e
 
 Before you begin, ensure you have the following installed:
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Node.js 18+](https://nodejs.org/) and npm
 - [Azure Developer CLI (azd)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [Azure Functions Core Tools v4](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- [Docker](https://www.docker.com/get-started) (for local development)
+- [Docker](https://www.docker.com/get-started)/[Rancher Desktop](https://rancherdesktop.io/) (for local development)
 - An Azure subscription with permissions to create resources
 
 ## Deploy to Azure
@@ -270,6 +270,11 @@ To switch back:
 azd env select prd-environment
 ```
 
+Remove the local environment config (.azure/<env>):
+
+```bash
+azd env remove prd-sorin --no-prompt
+```
 ## Learn More
 
 See here [How Microsoft Agent Framework (MAF) Is Used](./MAF_Usage.md)
