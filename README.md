@@ -47,12 +47,12 @@ Traditional AI agents can be unpredictable and inconsistent. The [Durable Task e
 
 Before you begin, ensure you have the following installed:
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Node.js 18+](https://nodejs.org/) and npm
 - [Azure Developer CLI (azd)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [Azure Functions Core Tools v4](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- [Docker](https://www.docker.com/get-started) (for local development)
+- [Docker](https://www.docker.com/get-started)/[Rancher Desktop](https://rancherdesktop.io/) (for local development)
 - An Azure subscription with permissions to create resources
 
 ## Deploy to Azure
@@ -127,6 +127,10 @@ This command will:
 
 Follow the prompts to select your subscription and region.
 
+#### Link Static Web App to API
+
+After deployment in Azure we need to link SPA with Api: [Link SPA with API](link_spa_api.md)
+
 ### 6. Access the Application
 
 Once deployment completes, the CLI will output the URLs for your services:
@@ -174,10 +178,13 @@ The dashboard shows:
 
 ### 1. Start Azure Storage Emulator
 
+Start **azurite** in the same root where **Azure Functions** will be started.
+
+
 **Bash**
 ```bash
 npm install -g azurite
-azurite --silent --location ./azurite &
+azurite --silent --location ./azurite
 ```
 
 **PowerShell**
@@ -229,6 +236,8 @@ az cognitiveservices account list --query "[?kind=='OpenAI']" -o table
 
 ### 4. Start the Backend
 
+Start functions in the same root where **azurite** has started.
+
 ```bash
 func start
 ```
@@ -251,7 +260,28 @@ To remove all Azure resources and avoid ongoing charges:
 azd down --purge
 ```
 
+## Working with env in Visual Studio Code
+
+First time **azd up** run create an envronment.
+
+To create a new one:
+
+```bash
+ azd env new prd-test-sorin
+```
+To switch back:
+```bash
+azd env select prd-environment
+```
+
+Remove the local environment config (.azure/<env>):
+
+```bash
+azd env remove prd-sorin --no-prompt
+```
 ## Learn More
+
+See here [How Microsoft Agent Framework (MAF) Is Used](./MAF_Usage.md)
 
 To learn more, please check out these resources:
 

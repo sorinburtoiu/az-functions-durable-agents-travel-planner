@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelPlannerFunctions", "TravelPlannerFunctions.csproj", "{F9EEB0A3-0699-973A-886B-EE02996E60A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelPlannerFunctions", "Backend\TravelPlannerFunctions.csproj", "{B05D6C3E-D731-04AA-773C-88F81CC5F47B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +10,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F9EEB0A3-0699-973A-886B-EE02996E60A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9EEB0A3-0699-973A-886B-EE02996E60A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9EEB0A3-0699-973A-886B-EE02996E60A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9EEB0A3-0699-973A-886B-EE02996E60A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B05D6C3E-D731-04AA-773C-88F81CC5F47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B05D6C3E-D731-04AA-773C-88F81CC5F47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B05D6C3E-D731-04AA-773C-88F81CC5F47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B05D6C3E-D731-04AA-773C-88F81CC5F47B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9B3517E0-C4AF-43FE-B867-09CACD956A02}
+		SolutionGuid = {B8E76FC5-4DA2-4D48-9121-8BB77A4DDFB0}
 	EndGlobalSection
 EndGlobal

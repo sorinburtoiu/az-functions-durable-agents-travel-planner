@@ -549,6 +549,8 @@ Please review this travel plan and click "Yes, Book My Trip!" below if you'd lik
     
     console.log("Document URL found:", documentUrl);
     
+    const safeUrl = encodeURI((documentUrl || '').trim());
+
     let resultContent = `
 # Your Trip Has Been Booked!
 
@@ -560,7 +562,7 @@ Destination: ${destinationName}
 Dates: ${travelDates}
 
 ## Document URL
-${documentUrl}
+[Open document](${safeUrl})
     `;
     
     setMessages(prevMessages => {

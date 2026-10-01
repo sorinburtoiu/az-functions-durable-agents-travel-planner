@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DURABLE_TASK_SCHEDULER_CONNECTION_STRING": "Endpoint=http://localhost:8080;Authentication=None",
+    "TASKHUB_NAME": "default",
+    "AZURE_OPENAI_ENDPOINT": "https://openai-XorinX-traveler.openai.azure.com/",
+    "AZURE_OPENAI_DEPLOYMENT_NAME": "gpt-4.1-mini"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*"
+  }
+}

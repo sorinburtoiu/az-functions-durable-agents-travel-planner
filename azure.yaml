@@ -9,7 +9,7 @@ infra:
     location: ${AZURE_LOCATION}
 services:
   api:
-    project: .
+    project: ./Backend
     language: dotnet
     host: function
   web:
